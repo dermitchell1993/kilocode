@@ -567,12 +567,17 @@ const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 					return
 				}
 
-				if (event.key === "Enter" && !event.shiftKey && !isComposing) {
+				// Require a modifier key (Ctrl/Cmd) with Enter to submit
+				// Shift+Enter still adds a newline (default behavior)
+				if (event.key === "Enter" && (event.ctrlKey || event.metaKey) && !isComposing) {
 					event.preventDefault()
 
 					resetHistoryNavigation()
 					onSend()
 				}
+				
+				// Plain Enter now just adds a newline (default behavior)
+				// No need to handle this explicitly as it's the default
 
 				if (event.key === "Backspace" && !isComposing) {
 					const charBeforeCursor = inputValue[cursorPosition - 1]
@@ -1436,9 +1441,9 @@ const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 						</button>
 					</StandardTooltip>
 					{!isEditMode && (
-						<StandardTooltip content={t("chat:sendMessage")}>
+						<StandardTooltip content={`${t("chat:sendMessage")} (Ctrl/Cmd+Enter)`}>
 							<button
-								aria-label={t("chat:sendMessage")}
+								aria-label={`${t("chat:sendMessage")} (Ctrl/Cmd+Enter)`}
 								disabled={sendingDisabled}
 								onClick={!sendingDisabled ? onSend : undefined}
 								className={cn(

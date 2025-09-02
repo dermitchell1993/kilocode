@@ -14,6 +14,10 @@ import { RecordSource } from "../context-tracking/FileContextTrackerTypes"
 import { unescapeHtmlEntities } from "../../utils/text-normalization"
 import { EXPERIMENT_IDS, experiments } from "../../shared/experiments"
 
+// Maximum number of consecutive apply_diff attempts allowed for the same file
+// to prevent infinite loops when the model keeps trying the same operation
+const MAX_APPLY_DIFF_ATTEMPTS = 3
+
 export async function applyDiffToolLegacy(
 	cline: Task,
 	block: ToolUse,

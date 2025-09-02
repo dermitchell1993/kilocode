@@ -5,6 +5,10 @@ import { TelemetryService } from "@roo-code/telemetry"
 import { DEFAULT_WRITE_DELAY_MS } from "@roo-code/types"
 
 import { ClineSayTool } from "../../shared/ExtensionMessage"
+
+// Maximum number of consecutive apply_diff attempts allowed for the same file
+// to prevent infinite loops when the model keeps trying the same operation
+const MAX_APPLY_DIFF_ATTEMPTS = 3
 import { getReadablePath } from "../../utils/path"
 import { Task } from "../task/Task"
 import { ToolUse, RemoveClosingTag, AskApproval, HandleError, PushToolResult } from "../../shared/tools"
@@ -442,6 +446,9 @@ Original error: ${errorMessage}`
 
 					TelemetryService.instance.captureDiffApplicationError(cline.taskId, currentCount)
 
+					// Check if we've exceeded the maximum number of attempts for this file
+					const maxAttemptsExceeded = currentCount > MAX_APPLY_DIFF_ATTEMPTS;
+					
 					if (diffResult.failParts && diffResult.failParts.length > 0) {
 						for (let i = 0; i < diffResult.failParts.length; i++) {
 							const failPart = diffResult.failParts[i]
@@ -464,6 +471,8 @@ Suggested fixes:
 4. Consider breaking complex changes into smaller diffs
 5. Ensure start_line parameter matches the actual content location
 ${errorDetails ? `\nDetailed error information:\n${errorDetails}\n` : ""}
+${maxAttemptsExceeded ? `\n⚠️ WARNING: Maximum number of attempts (${MAX_APPLY_DIFF_ATTEMPTS}) exceeded for this file. 
+Please try a different approach, such as using write_to_file instead, or breaking your changes into smaller parts.\n` : ""}
 </error_details>\n\n`
 						}
 					} else {
@@ -479,6 +488,8 @@ Recovery suggestions:
 4. Consider using line numbers with start_line parameter
 5. Break large changes into smaller, more specific diffs
 ${errorDetails ? `\nTechnical details:\n${errorDetails}\n` : ""}
+${maxAttemptsExceeded ? `\n⚠️ WARNING: Maximum number of attempts (${MAX_APPLY_DIFF_ATTEMPTS}) exceeded for this file. 
+Please try a different approach, such as using write_to_file instead, or breaking your changes into smaller parts.\n` : ""}
 </error_details>\n\n`
 					}
 				} else {
@@ -491,9 +502,21 @@ ${errorDetails ? `\nTechnical details:\n${errorDetails}\n` : ""}
 				if (successCount === 0) {
 					if (formattedError) {
 						const currentCount = cline.consecutiveMistakeCountForApplyDiff.get(relPath) || 0
-						if (currentCount >= 2) {
+						
+						// Check if we've exceeded the maximum number of attempts
+						const maxAttemptsExceeded = currentCount > MAX_APPLY_DIFF_ATTEMPTS;
+						
+						// Always show error if max attempts exceeded or after 2 attempts
+						if (currentCount >= 2 || maxAttemptsExceeded) {
 							await cline.say("diff_error", formattedError)
 						}
+						
+						// If max attempts exceeded, add a special flag to prevent further attempts
+						if (maxAttemptsExceeded) {
+							// Add a special flag to the error to indicate max attempts exceeded
+							formattedError = `<max_attempts_exceeded>\n${formattedError}\n</max_attempts_exceeded>`;
+						}
+						
 						cline.recordToolError("apply_diff", formattedError)
 						results.push(formattedError)
 
@@ -503,6 +526,7 @@ ${errorDetails ? `\nTechnical details:\n${errorDetails}\n` : ""}
 								tool: "appliedDiff",
 								path: getReadablePath(cline.cwd, relPath),
 								diff: diffItems.map((item) => item.content).join("\n\n"),
+								maxAttemptsExceeded: maxAttemptsExceeded,
 							}
 							// Send a complete message (partial: false) to update the UI and stop the spinner
 							await cline.ask("tool", JSON.stringify(sharedMessageProps), false).catch(() => {})
