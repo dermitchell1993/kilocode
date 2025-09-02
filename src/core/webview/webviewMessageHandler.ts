@@ -1409,6 +1409,10 @@ export const webviewMessageHandler = async (
 			await updateGlobalState("showTaskTimeline", message.bool ?? false)
 			await provider.postStateToWebview()
 			break
+\t	case "requireModifierKeyForSubmit":
+\			await updateGlobalState("requireModifierKeyForSubmit", message.bool ?? true)
+\			await provider.postStateToWebview()
+\			break
 		case "allowVeryLargeReads":
 			await updateGlobalState("allowVeryLargeReads", message.bool ?? false)
 			await provider.postStateToWebview()

@@ -1813,6 +1813,7 @@ export class ClineProvider
 			language,
 			showAutoApproveMenu, // kilocode_change
 			showTaskTimeline, // kilocode_change
+\t		requireModifierKeyForSubmit, // New setting for Enter key behavior
 			maxReadFileLine,
 			maxImageFileSize,
 			maxTotalImageSize,
@@ -1936,6 +1937,7 @@ export class ClineProvider
 			showRooIgnoredFiles: showRooIgnoredFiles ?? true,
 			showAutoApproveMenu: showAutoApproveMenu ?? false, // kilocode_change
 			showTaskTimeline: showTaskTimeline ?? true, // kilocode_change
+\t		requireModifierKeyForSubmit: requireModifierKeyForSubmit ?? true, // New setting for Enter key behavior
 			language, // kilocode_change
 			renderContext: this.renderContext,
 			maxReadFileLine: maxReadFileLine ?? -1,
@@ -2139,6 +2141,7 @@ export class ClineProvider
 			showRooIgnoredFiles: stateValues.showRooIgnoredFiles ?? true,
 			showAutoApproveMenu: stateValues.showAutoApproveMenu ?? false, // kilocode_change
 			showTaskTimeline: stateValues.showTaskTimeline ?? true, // kilocode_change
+\t		requireModifierKeyForSubmit: stateValues.requireModifierKeyForSubmit ?? true, // New setting for Enter key behavior
 			maxReadFileLine: stateValues.maxReadFileLine ?? -1,
 			maxImageFileSize: stateValues.maxImageFileSize ?? 5,
 			maxTotalImageSize: stateValues.maxTotalImageSize ?? 20,

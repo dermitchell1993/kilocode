@@ -369,6 +369,7 @@ export type ExtensionState = Pick<
 	settingsImportedAt?: number
 	historyPreviewCollapsed?: boolean
 	showTaskTimeline?: boolean // kilocode_change
+	requireModifierKeyForSubmit?: boolean // New setting for Enter key behavior
 
 	cloudUserInfo: CloudUserInfo | null
 	cloudIsAuthenticated: boolean

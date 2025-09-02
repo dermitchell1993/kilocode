@@ -229,6 +229,7 @@ export interface WebviewMessage {
 		| "getUsageData" // kilocode_change
 		| "usageDataResponse" // kilocode_change
 		| "showTaskTimeline" // kilocode_change
+		| "requireModifierKeyForSubmit" // New setting for Enter key behavior
 		| "toggleTaskFavorite" // kilocode_change
 		| "fixMermaidSyntax" // kilocode_change
 		| "mermaidFixResponse" // kilocode_change

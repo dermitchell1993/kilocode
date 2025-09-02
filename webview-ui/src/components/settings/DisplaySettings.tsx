@@ -11,10 +11,11 @@ import { generateSampleTimelineData } from "../../utils/timeline/mockData"
 
 type DisplaySettingsProps = HTMLAttributes<HTMLDivElement> & {
 	showTaskTimeline?: boolean
-	setCachedStateField: SetCachedStateField<"showTaskTimeline">
+	requireModifierKeyForSubmit?: boolean
+	setCachedStateField: SetCachedStateField<"showTaskTimeline" | "requireModifierKeyForSubmit">
 }
 
-export const DisplaySettings = ({ showTaskTimeline, setCachedStateField, ...props }: DisplaySettingsProps) => {
+export const DisplaySettings = ({ showTaskTimeline, requireModifierKeyForSubmit, setCachedStateField, ...props }: DisplaySettingsProps) => {
 	const { t } = useAppTranslation()
 
 	const sampleTimelineData = useMemo(() => generateSampleTimelineData(), [])
@@ -47,6 +48,21 @@ export const DisplaySettings = ({ showTaskTimeline, setCachedStateField, ...prop
 						<div className="opacity-60">
 							<TaskTimeline groupedMessages={sampleTimelineData} isTaskActive={false} />
 						</div>
+					</div>
+				</div>
+			</Section>
+
+			<Section>
+				<div>
+					<VSCodeCheckbox
+						checked={requireModifierKeyForSubmit}
+						onChange={(e: any) => {
+							setCachedStateField("requireModifierKeyForSubmit", e.target.checked)
+						}}>
+						<span className="font-medium">Require modifier key for chat submission</span>
+					</VSCodeCheckbox>
+					<div className="text-vscode-descriptionForeground text-sm mt-1">
+						When enabled, requires Ctrl/Cmd+Enter to submit messages. When disabled, pressing Enter will submit messages (original behavior).
 					</div>
 				</div>
 			</Section>

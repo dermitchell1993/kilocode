@@ -37,6 +37,8 @@ export interface ExtensionStateContextType extends ExtensionState {
 	systemNotificationsEnabled?: boolean // kilocode_change
 	setSystemNotificationsEnabled: (value: boolean) => void // kilocode_change
 	dismissedNotificationIds: string[] // kilocode_change
+	requireModifierKeyForSubmit?: boolean // Require Ctrl/Cmd+Enter for chat submission
+	setRequireModifierKeyForSubmit: (value: boolean) => void // Setter for requireModifierKeyForSubmit
 	didHydrateState: boolean
 	showWelcome: boolean
 	theme: any
@@ -298,6 +300,7 @@ export const ExtensionStateContextProvider: React.FC<{ children: React.ReactNode
 	const [mcpMarketplaceCatalog, setMcpMarketplaceCatalog] = useState<McpMarketplaceCatalog>({ items: [] }) // kilocode_change
 	const [currentCheckpoint, setCurrentCheckpoint] = useState<string>()
 	const [extensionRouterModels, setExtensionRouterModels] = useState<RouterModels | undefined>(undefined)
+	const [requireModifierKeyForSubmit, setRequireModifierKeyForSubmit] = useState(true) // Default to requiring modifier key
 	// kilocode_change start
 	const [globalRules, setGlobalRules] = useState<ClineRulesToggles>({})
 	const [localRules, setLocalRules] = useState<ClineRulesToggles>({})
@@ -548,6 +551,7 @@ export const ExtensionStateContextProvider: React.FC<{ children: React.ReactNode
 		setShowAutoApproveMenu: (value) => setState((prevState) => ({ ...prevState, showAutoApproveMenu: value })),
 		setShowTaskTimeline: (value) => setState((prevState) => ({ ...prevState, showTaskTimeline: value })),
 		setHoveringTaskTimeline: (value) => setState((prevState) => ({ ...prevState, hoveringTaskTimeline: value })),
+		setRequireModifierKeyForSubmit: (value) => setState((prevState) => ({ ...prevState, requireModifierKeyForSubmit: value })),
 		// kilocode_change end
 		setAutoApprovalEnabled: (value) => setState((prevState) => ({ ...prevState, autoApprovalEnabled: value })),
 		setCustomModes: (value) => setState((prevState) => ({ ...prevState, customModes: value })),

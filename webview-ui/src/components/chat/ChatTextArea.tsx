@@ -109,6 +109,7 @@ const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 			globalWorkflows, // kilocode_change
 			taskHistory,
 			clineMessages,
+			requireModifierKeyForSubmit, // New setting for Enter key behavior
 		} = useExtensionState()
 
 		// Find the ID and display text for the currently selected API configuration
@@ -567,17 +568,17 @@ const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 					return
 				}
 
-				// Require a modifier key (Ctrl/Cmd) with Enter to submit
-				// Shift+Enter still adds a newline (default behavior)
-				if (event.key === "Enter" && (event.ctrlKey || event.metaKey) && !isComposing) {
-					event.preventDefault()
-
-					resetHistoryNavigation()
-					onSend()
+				// Check if we need a modifier key (Ctrl/Cmd) with Enter to submit
+				// Shift+Enter always adds a newline (default behavior)
+				if (event.key === "Enter" && !event.shiftKey && !isComposing) {
+					// If requireModifierKeyForSubmit is true, we need Ctrl/Cmd+Enter
+					// If requireModifierKeyForSubmit is false, just Enter is enough
+					if ((!requireModifierKeyForSubmit) || (requireModifierKeyForSubmit && (event.ctrlKey || event.metaKey))) {
+						event.preventDefault()
+						resetHistoryNavigation()
+						onSend()
+					}
 				}
-				
-				// Plain Enter now just adds a newline (default behavior)
-				// No need to handle this explicitly as it's the default
 
 				if (event.key === "Backspace" && !isComposing) {
 					const charBeforeCursor = inputValue[cursorPosition - 1]
@@ -1326,7 +1327,8 @@ const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 						onHeightChange?.(height)
 					}}
 					// kilocode_change: combine placeholderText and placeholderBottomText here
-					placeholder={`${placeholderText}\n${placeholderBottomText}`}
+					// Add information about Enter key behavior based on requireModifierKeyForSubmit setting
+					placeholder={`${placeholderText}${requireModifierKeyForSubmit ? ' (Ctrl/Cmd+Enter to submit)' : ' (Enter to submit)'}\n${placeholderBottomText}`}
 					minRows={3}
 					maxRows={15}
 					autoFocus={true}
