@@ -1443,9 +1443,9 @@ const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 						</button>
 					</StandardTooltip>
 					{!isEditMode && (
-						<StandardTooltip content={`${t("chat:sendMessage")} (Ctrl/Cmd+Enter)`}>
+						<StandardTooltip content={`${t("chat:sendMessage")}${requireModifierKeyForSubmit ? ' (Ctrl/Cmd+Enter)' : ' (Enter)'}`}>
 							<button
-								aria-label={`${t("chat:sendMessage")} (Ctrl/Cmd+Enter)`}
+								aria-label={`${t("chat:sendMessage")}${requireModifierKeyForSubmit ? ' (Ctrl/Cmd+Enter)' : ' (Enter)'}`}
 								disabled={sendingDisabled}
 								onClick={!sendingDisabled ? onSend : undefined}
 								className={cn(
