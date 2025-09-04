@@ -42,7 +42,8 @@
 	"workspace": {
 		"prefix": "Arbeitsbereich:",
 		"current": "Aktuell",
-		"all": "Alle"
+		"all": "Alle",
+		"none": "Kein Arbeitsbereich"
 	},
 	"sort": {
 		"prefix": "Sortieren:",

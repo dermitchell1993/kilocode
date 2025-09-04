@@ -49,6 +49,16 @@ const mockTaskHistory: HistoryItem[] = [
 		totalCost: 0.05,
 		workspace: "/workspace/project2",
 	},
+	{
+		id: "task-4",
+		number: 4,
+		task: "General task without workspace",
+		ts: new Date("2022-02-18T12:00:00").getTime(),
+		tokensIn: 80,
+		tokensOut: 40,
+		totalCost: 0.008,
+		workspace: undefined, // No workspace
+	},
 ]
 
 describe("useTaskSearch", () => {
@@ -75,77 +85,95 @@ describe("useTaskSearch", () => {
 		expect(result.current.tasks.every((task) => task.workspace === "/workspace/project1")).toBe(true)
 	})
 
-	it("shows all workspaces when showAllWorkspaces is true", () => {
+	it("shows all workspaces when workspaceFilter is 'all'", () => {
 		const { result } = renderHook(() => useTaskSearch())
 
 		act(() => {
-			result.current.setShowAllWorkspaces(true)
+			result.current.setWorkspaceFilter("all")
 		})
 
-		expect(result.current.tasks).toHaveLength(3)
-		expect(result.current.showAllWorkspaces).toBe(true)
+		expect(result.current.tasks).toHaveLength(4) // All tasks including the one without workspace
+		expect(result.current.workspaceFilter).toBe("all")
+	})
+
+	it("shows only tasks without workspace when workspaceFilter is 'none'", () => {
+		const { result } = renderHook(() => useTaskSearch())
+
+		act(() => {
+			result.current.setWorkspaceFilter("none")
+		})
+
+		expect(result.current.tasks).toHaveLength(1) // Only the task without workspace
+		expect(result.current.tasks[0].id).toBe("task-4")
+		expect(result.current.tasks[0].workspace).toBeUndefined()
+		expect(result.current.workspaceFilter).toBe("none")
 	})
 
 	it("sorts by newest by default", () => {
 		const { result } = renderHook(() => useTaskSearch())
 
 		act(() => {
-			result.current.setShowAllWorkspaces(true)
+			result.current.setWorkspaceFilter("all")
 		})
 
 		expect(result.current.sortOption).toBe("newest")
-		expect(result.current.tasks[0].id).toBe("task-2") // Feb 17
-		expect(result.current.tasks[1].id).toBe("task-1") // Feb 16
-		expect(result.current.tasks[2].id).toBe("task-3") // Feb 15
+		expect(result.current.tasks[0].id).toBe("task-4") // Feb 18
+		expect(result.current.tasks[1].id).toBe("task-2") // Feb 17
+		expect(result.current.tasks[2].id).toBe("task-1") // Feb 16
+		expect(result.current.tasks[3].id).toBe("task-3") // Feb 15
 	})
 
 	it("sorts by oldest", () => {
 		const { result } = renderHook(() => useTaskSearch())
 
 		act(() => {
-			result.current.setShowAllWorkspaces(true)
+			result.current.setWorkspaceFilter("all")
 			result.current.setSortOption("oldest")
 		})
 
 		expect(result.current.tasks[0].id).toBe("task-3") // Feb 15
 		expect(result.current.tasks[1].id).toBe("task-1") // Feb 16
 		expect(result.current.tasks[2].id).toBe("task-2") // Feb 17
+		expect(result.current.tasks[3].id).toBe("task-4") // Feb 18
 	})
 
 	it("sorts by most expensive", () => {
 		const { result } = renderHook(() => useTaskSearch())
 
 		act(() => {
-			result.current.setShowAllWorkspaces(true)
+			result.current.setWorkspaceFilter("all")
 			result.current.setSortOption("mostExpensive")
 		})
 
 		expect(result.current.tasks[0].id).toBe("task-3") // $0.05
 		expect(result.current.tasks[1].id).toBe("task-2") // $0.02
 		expect(result.current.tasks[2].id).toBe("task-1") // $0.01
+		expect(result.current.tasks[3].id).toBe("task-4") // $0.008
 	})
 
 	it("sorts by most tokens", () => {
 		const { result } = renderHook(() => useTaskSearch())
 
 		act(() => {
-			result.current.setShowAllWorkspaces(true)
+			result.current.setWorkspaceFilter("all")
 			result.current.setSortOption("mostTokens")
 		})
 
 		// task-2: 200 + 100 + 25 + 10 = 335 tokens
 		// task-3: 150 + 75 = 225 tokens
 		// task-1: 100 + 50 = 150 tokens
+		// task-4: 80 + 40 = 120 tokens
 		expect(result.current.tasks[0].id).toBe("task-2")
 		expect(result.current.tasks[1].id).toBe("task-3")
 		expect(result.current.tasks[2].id).toBe("task-1")
+		expect(result.current.tasks[3].id).toBe("task-4")
 	})
 
 	it("filters tasks by search query", () => {
 		const { result } = renderHook(() => useTaskSearch())
 
 		act(() => {
-			result.current.setShowAllWorkspaces(true)
+			result.current.setWorkspaceFilter("all")
 			result.current.setSearchQuery("React")
 		})
 
@@ -252,11 +280,11 @@ describe("useTaskSearch", () => {
 		const { result } = renderHook(() => useTaskSearch())
 
 		act(() => {
-			result.current.setShowAllWorkspaces(true)
+			result.current.setWorkspaceFilter("all")
 		})
 
 		// Should only include tasks with both ts and task content
-		expect(result.current.tasks).toHaveLength(3)
+		expect(result.current.tasks).toHaveLength(4)
 		expect(result.current.tasks.every((task) => task.ts && task.task)).toBe(true)
 	})
 
@@ -264,7 +292,7 @@ describe("useTaskSearch", () => {
 		const { result } = renderHook(() => useTaskSearch())
 
 		act(() => {
-			result.current.setShowAllWorkspaces(true)
+			result.current.setWorkspaceFilter("all")
 			result.current.setSearchQuery("nonexistent")
 		})
 
@@ -275,7 +303,7 @@ describe("useTaskSearch", () => {
 		const { result } = renderHook(() => useTaskSearch())
 
 		act(() => {
-			result.current.setShowAllWorkspaces(true)
+			result.current.setWorkspaceFilter("all")
 			result.current.setSearchQuery("test")
 			result.current.setSortOption("mostRelevant")
 		})

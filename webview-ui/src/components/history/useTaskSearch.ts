@@ -5,13 +5,14 @@ import { highlightFzfMatch } from "@/utils/highlight"
 import { useExtensionState } from "@/context/ExtensionStateContext"
 
 type SortOption = "newest" | "oldest" | "mostExpensive" | "mostTokens" | "mostRelevant"
+type WorkspaceFilter = "all" | "current" | "none"
 
 export const useTaskSearch = () => {
 	const { taskHistory, cwd } = useExtensionState()
 	const [searchQuery, setSearchQuery] = useState("")
 	const [sortOption, setSortOption] = useState<SortOption>("newest")
 	const [lastNonRelevantSort, setLastNonRelevantSort] = useState<SortOption | null>("newest")
-	const [showAllWorkspaces, setShowAllWorkspaces] = useState(false)
+	const [workspaceFilter, setWorkspaceFilter] = useState<WorkspaceFilter>("current")
 	const [showFavoritesOnly, setShowFavoritesOnly] = useState(false) // kilocode_change
 
 	useEffect(() => {
@@ -26,16 +27,22 @@ export const useTaskSearch = () => {
 
 	const presentableTasks = useMemo(() => {
 		let tasks = taskHistory.filter((item) => item.ts && item.task)
-		if (!showAllWorkspaces) {
+		
+		// Apply workspace filtering
+		if (workspaceFilter === "current") {
 			tasks = tasks.filter((item) => item.workspace === cwd)
+		} else if (workspaceFilter === "none") {
+			tasks = tasks.filter((item) => !item.workspace)
 		}
+		// "all" shows everything (no workspace filtering)
+		
 		// kilocode_change start
 		if (showFavoritesOnly) {
 			tasks = tasks.filter((item) => item.isFavorited)
 		}
 		// kilocode_change end
 		return tasks
-	}, [taskHistory, showAllWorkspaces, showFavoritesOnly, cwd]) // kilocode_change
+	}, [taskHistory, workspaceFilter, showFavoritesOnly, cwd]) // kilocode_change
 
 	const fzf = useMemo(() => {
 		return new Fzf(presentableTasks, {
@@ -92,8 +99,8 @@ export const useTaskSearch = () => {
 		setSortOption,
 		lastNonRelevantSort,
 		setLastNonRelevantSort,
-		showAllWorkspaces,
-		setShowAllWorkspaces,
+		workspaceFilter,
+		setWorkspaceFilter,
 		showFavoritesOnly,
 		setShowFavoritesOnly,
 	}

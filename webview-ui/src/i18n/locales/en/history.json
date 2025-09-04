@@ -35,7 +35,8 @@
 	"workspace": {
 		"prefix": "Workspace:",
 		"current": "Current",
-		"all": "All"
+		"all": "All",
+		"none": "No Workspace"
 	},
 	"sort": {
 		"prefix": "Sort:",

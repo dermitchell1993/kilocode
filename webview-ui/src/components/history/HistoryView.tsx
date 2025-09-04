@@ -36,8 +36,8 @@ const HistoryView = ({ onDone }: HistoryViewProps) => {
 		sortOption,
 		setSortOption,
 		setLastNonRelevantSort,
-		showAllWorkspaces,
-		setShowAllWorkspaces,
+		workspaceFilter,
+		setWorkspaceFilter,
 		showFavoritesOnly, // kilocode_change
 		setShowFavoritesOnly, // kilocode_change
 	} = useTaskSearch()
@@ -132,12 +132,12 @@ const HistoryView = ({ onDone }: HistoryViewProps) => {
 					</VSCodeTextField>
 					<div className="flex gap-2">
 						<Select
-							value={showAllWorkspaces ? "all" : "current"}
-							onValueChange={(value) => setShowAllWorkspaces(value === "all")}>
+							value={workspaceFilter}
+							onValueChange={(value) => setWorkspaceFilter(value as "all" | "current" | "none")}>
 							<SelectTrigger className="flex-1">
 								<SelectValue>
 									{t("history:workspace.prefix")}{" "}
-									{t(`history:workspace.${showAllWorkspaces ? "all" : "current"}`)}
+									{t(`history:workspace.${workspaceFilter}`)}
 								</SelectValue>
 							</SelectTrigger>
 							<SelectContent>
@@ -151,6 +151,12 @@ const HistoryView = ({ onDone }: HistoryViewProps) => {
 									<div className="flex items-center gap-2">
 										<span className="codicon codicon-folder-opened" />
 										{t("history:workspace.all")}
+									</div>
+								</SelectItem>
+								<SelectItem value="none">
+									<div className="flex items-center gap-2">
+										<span className="codicon codicon-file" />
+										{t("history:workspace.none")}
 									</div>
 								</SelectItem>
 							</SelectContent>
@@ -254,7 +260,7 @@ const HistoryView = ({ onDone }: HistoryViewProps) => {
 							key={item.id}
 							item={item}
 							variant="full"
-							showWorkspace={showAllWorkspaces}
+							showWorkspace={workspaceFilter === "all"}
 							isSelectionMode={isSelectionMode}
 							isSelected={selectedTaskIds.includes(item.id)}
 							onToggleSelection={toggleTaskSelection}
