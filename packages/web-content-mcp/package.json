@@ -1,0 +1,44 @@
+{
+  "name": "@kilocode/web-content-mcp",
+  "version": "1.0.0",
+  "description": "Lean, high-performance MCP server for web content retrieval and semantic analysis",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "test": "vitest",
+    "lint": "eslint src --ext .ts",
+    "clean": "rimraf dist"
+  },
+  "keywords": [
+    "mcp",
+    "web-scraping",
+    "content-analysis",
+    "semantic-analysis",
+    "performance",
+    "macbook-air"
+  ],
+  "author": "Kilo Code",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.12.0",
+    "cheerio": "^1.0.0",
+    "node-fetch": "^3.3.2",
+    "lru-cache": "^10.1.0",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.1.0",
+    "eslint": "^8.56.0",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
+    "rimraf": "^5.0.5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
