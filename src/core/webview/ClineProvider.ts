@@ -1625,6 +1625,26 @@ export class ClineProvider
 		await this.postStateToWebview()
 	}
 
+	async changeTaskWorkspace(taskId: string, newWorkspacePath: string) {
+		const taskHistory = this.getGlobalState("taskHistory") ?? []
+		const taskIndex = taskHistory.findIndex((task) => task.id === taskId)
+		
+		if (taskIndex === -1) {
+			throw new Error(`Task with ID ${taskId} not found`)
+		}
+		
+		// Update the task's workspace
+		taskHistory[taskIndex] = {
+			...taskHistory[taskIndex],
+			workspace: newWorkspacePath
+		}
+		
+		await this.updateGlobalState("taskHistory", taskHistory)
+		this.kiloCodeTaskHistoryVersion++
+		this.recentTasksCache = undefined
+		await this.postStateToWebview()
+	}
+
 	async refreshWorkspace() {
 		this.currentWorkspacePath = getWorkspacePath()
 		await this.postStateToWebview()

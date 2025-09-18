@@ -12,9 +12,13 @@ export function getTaskHistory(
 ): TaskHistoryResponsePayload {
 	let tasks = taskHistory.filter((item) => item.ts && item.task)
 
+	// Enhanced workspace filtering
 	if (request.workspace === "current") {
 		tasks = tasks.filter((item) => item.workspace === cwd)
+	} else if (request.workspace === "unassigned") {
+		tasks = tasks.filter((item) => !item.workspace || item.workspace.trim() === "")
 	}
+	// "all" workspace mode shows all tasks (no filtering)
 
 	if (request.favoritesOnly) {
 		tasks = tasks.filter((item) => item.isFavorited)

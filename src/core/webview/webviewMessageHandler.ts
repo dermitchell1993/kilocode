@@ -12,6 +12,7 @@ import {
 	SeeNewChangesPayload,
 	TaskHistoryRequestPayload,
 	TasksByIdRequestPayload,
+	ChangeTaskWorkspacePayload,
 } from "../../shared/WebviewMessage"
 // kilocode_change end
 
@@ -660,8 +661,23 @@ export const webviewMessageHandler = async (
 			provider.condenseTaskContext(message.text!)
 			break
 		case "deleteTaskWithId":
-			provider.deleteTaskWithId(message.text!)
+		case "changeTaskWorkspace": {
+			const payload = message.payload as ChangeTaskWorkspacePayload
+			await provider.changeTaskWorkspace(payload.taskId, payload.newWorkspacePath)
 			break
+		}
+			provider.deleteTaskWithId(message.text!)
+		case "changeTaskWorkspace": {
+			const payload = message.payload as ChangeTaskWorkspacePayload
+			await provider.changeTaskWorkspace(payload.taskId, payload.newWorkspacePath)
+			break
+		}
+			break
+		case "changeTaskWorkspace": {
+			const payload = message.payload as ChangeTaskWorkspacePayload
+			await provider.changeTaskWorkspace(payload.taskId, payload.newWorkspacePath)
+			break
+		}
 		case "deleteMultipleTasksWithIds": {
 			const ids = message.ids
 

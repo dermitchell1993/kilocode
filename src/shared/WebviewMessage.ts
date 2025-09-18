@@ -70,6 +70,7 @@ export interface WebviewMessage {
 		| "showTaskWithId"
 		| "deleteTaskWithId"
 		| "exportTaskWithId"
+		| "changeTaskWorkspace"
 		| "importSettings"
 		| "toggleToolAutoApprove"
 		| "openExtensionSettings"
@@ -417,7 +418,7 @@ export interface TasksByIdRequestPayload {
 
 export interface TaskHistoryRequestPayload {
 	requestId: string
-	workspace: "current" | "all"
+	workspace: "current" | "all" | "unassigned"
 	sort: "newest" | "oldest" | "mostExpensive" | "mostTokens" | "mostRelevant"
 	favoritesOnly: boolean
 	pageIndex: number
@@ -434,6 +435,11 @@ export interface TaskHistoryResponsePayload {
 	historyItems: HistoryItem[]
 	pageIndex: number
 	pageCount: number
+}
+
+export interface ChangeTaskWorkspacePayload {
+	taskId: string
+	newWorkspacePath: string
 }
 // kilocode_change end
 
@@ -480,6 +486,7 @@ export type WebViewMessagePayload =
 	| SeeNewChangesPayload
 	| TasksByIdRequestPayload
 	| TaskHistoryRequestPayload
+	| ChangeTaskWorkspacePayload
 	// kilocode_change end
 	| CheckpointDiffPayload
 	| CheckpointRestorePayload
