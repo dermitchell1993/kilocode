@@ -1,4 +1,5 @@
 import * as vscode from "vscode"
+import * as path from "path"
 
 import {
 	type GroupOptions,
@@ -33,10 +34,12 @@ function getGroupOptions(group: GroupEntry): GroupOptions | undefined {
 }
 
 // Helper to check if a file path matches a regex pattern
+// NOTE: Tests pattern against filename only, not the full path
 export function doesFileMatchRegex(filePath: string, pattern: string): boolean {
 	try {
 		const regex = new RegExp(pattern)
-		return regex.test(filePath)
+		const filename = path.basename(filePath)
+		return regex.test(filename)
 	} catch (error) {
 		console.error(`Invalid regex pattern: ${pattern}`, error)
 		return false

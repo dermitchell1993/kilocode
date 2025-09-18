@@ -9,7 +9,14 @@ vi.mock("../../core/prompts/sections/custom-instructions", () => ({
 	addCustomInstructions: vi.fn().mockResolvedValue("Combined instructions"),
 }))
 
-import { isToolAllowedForMode, FileRestrictionError, getFullModeDetails, modes, getModeSelection } from "../modes"
+import {
+	isToolAllowedForMode,
+	FileRestrictionError,
+	getFullModeDetails,
+	modes,
+	getModeSelection,
+	doesFileMatchRegex,
+} from "../modes"
 import { addCustomInstructions } from "../../core/prompts/sections/custom-instructions"
 
 describe("isToolAllowedForMode", () => {
@@ -702,5 +709,69 @@ describe("getModeSelection", () => {
 		const selection = getModeSelection("ask", promptComponentAsk, undefined)
 		expect(selection.roleDefinition).toBe(promptComponentAsk.roleDefinition)
 		expect(selection.baseInstructions).toBe(promptComponentAsk.customInstructions)
+	})
+})
+
+describe("doesFileMatchRegex", () => {
+	it("matches filenames only, not full paths", () => {
+		const pattern = "^(test_.*|.*_test|.*_spec)\\.py$"
+
+		// Should match - files in subdirectories
+		expect(doesFileMatchRegex("./tests/test_search_tool.py", pattern)).toBe(true)
+		expect(doesFileMatchRegex("tests/test_search_tool.py", pattern)).toBe(true)
+		expect(doesFileMatchRegex("src/utils_test.py", pattern)).toBe(true)
+		expect(doesFileMatchRegex("lib/parser_spec.py", pattern)).toBe(true)
+
+		// Should match - root level files
+		expect(doesFileMatchRegex("test_search_tool.py", pattern)).toBe(true)
+		expect(doesFileMatchRegex("utils_test.py", pattern)).toBe(true)
+
+		// Should not match
+		expect(doesFileMatchRegex("not_a_test_file.py", pattern)).toBe(false)
+		expect(doesFileMatchRegex("tests/regular_file.py", pattern)).toBe(false)
+	})
+
+	it("handles JavaScript/TypeScript test patterns", () => {
+		const pattern = "\\.(test|spec)\\.(js|ts|jsx|tsx)$"
+
+		// Should match
+		expect(doesFileMatchRegex("components/Button.test.js", pattern)).toBe(true)
+		expect(doesFileMatchRegex("lib/parser.spec.ts", pattern)).toBe(true)
+		expect(doesFileMatchRegex("utils.test.jsx", pattern)).toBe(true)
+		expect(doesFileMatchRegex("hooks.spec.tsx", pattern)).toBe(true)
+
+		// Should not match
+		expect(doesFileMatchRegex("regular_file.js", pattern)).toBe(false)
+		expect(doesFileMatchRegex("components/Button.js", pattern)).toBe(false)
+	})
+
+	it("handles edge cases", () => {
+		const pattern = "\\.md$"
+
+		// Should match
+		expect(doesFileMatchRegex("README.md", pattern)).toBe(true)
+		expect(doesFileMatchRegex("docs/guide.md", pattern)).toBe(true)
+		expect(doesFileMatchRegex("./nested/deep/file.md", pattern)).toBe(true)
+
+		// Should not match
+		expect(doesFileMatchRegex("file.txt", pattern)).toBe(false)
+		expect(doesFileMatchRegex("docs/file.markdown", pattern)).toBe(false)
+	})
+
+	it("handles invalid regex patterns gracefully", () => {
+		const invalidPattern = "[unclosed"
+
+		// Should return false for invalid patterns
+		expect(doesFileMatchRegex("any_file.txt", invalidPattern)).toBe(false)
+	})
+
+	it("handles empty and special paths", () => {
+		const pattern = "\\.py$"
+
+		// Edge cases
+		expect(doesFileMatchRegex("file.py", pattern)).toBe(true)
+		expect(doesFileMatchRegex("./file.py", pattern)).toBe(true)
+		expect(doesFileMatchRegex("../file.py", pattern)).toBe(true)
+		expect(doesFileMatchRegex("", pattern)).toBe(false)
 	})
 })
