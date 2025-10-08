@@ -2,6 +2,8 @@
  * Type definitions for Task-related metadata
  */
 
+import type { TaskForkMetadata } from "./ForkTypes.js"
+
 /**
  * GPT-5 specific metadata stored with assistant messages
  * for maintaining conversation continuity across requests
@@ -34,4 +36,18 @@ export interface ClineMessageWithMetadata {
 		gpt5?: Gpt5Metadata
 		[key: string]: any
 	}
+}
+
+/**
+ * Extended TaskMetadata with fork support
+ * 
+ * This extends the base TaskMetadata type from packages/types/src/task.ts
+ * to include fork-related information.
+ */
+export interface TaskMetadataWithFork {
+	task?: string
+	images?: string[]
+	
+	/** Fork-related metadata */
+	forkMetadata?: TaskForkMetadata
 }
